@@ -19,7 +19,17 @@ method isPrefix(pre: string, str: string) returns (res:bool)
 	ensures !res <==> isNotPrefixPred(pre,str)
 	ensures  res <==> isPrefixPred(pre,str)
 {
-//TODO: insert your code here
+	// now that i know more about dafny i could rewrite my original to be much cleaner
+	if (|pre| > |str|) {
+		return false;
+	}
+
+	if (|pre| == 0) {
+		return true;
+	}
+
+	return (pre == str[..|pre|]); 
+    
 }
 predicate isSubstringPred(sub:string, str:string)
 {
@@ -40,7 +50,24 @@ method isSubstring(sub: string, str: string) returns (res:bool)
 	ensures  res <==> isSubstringPred(sub, str)
 	//ensures !res <==> isNotSubstringPred(sub, str) // This postcondition follows from the above lemma.
 {
-//TODO: insert your code here
+	//assume false try prove true
+	res := false;
+
+	if (|sub| > |str|) {
+		return false;
+	}
+
+	var i := 0;
+	// the reason this loop is i <= |str| is because we need to check the empty sequence given by str[..|str|]
+	while (i <= |str| && res == false && |str[i..]| >= |sub|) 
+	invariant 0 <= i <= |str| + 1
+	invariant (forall j :: 0 <= j < i ==> isNotPrefixPred(sub, str[j..])) <==> res == false
+	decreases |str| - i;
+	{
+		res := isPrefix(sub, str[i..]);
+		i := i + 1;
+	}
+	return res;
 }
 
 
@@ -63,7 +90,20 @@ method haveCommonKSubstring(k: nat, str1: string, str2: string) returns (found: 
 	ensures found  <==>  haveCommonKSubstringPred(k,str1,str2)
 	//ensures !found <==> haveNotCommonKSubstringPred(k,str1,str2) // This postcondition follows from the above lemma.
 {
-//TODO: insert your code here
+	//assume false try to prove true
+	found := false;
+	if (k > |str1| || k > |str2|) {
+		return found;
+	}
+
+	//check each k substring in string 1 to each k substring in string 2
+	var i := 0;
+	while (i < |str1| - k && found == false)
+	invariant 0 <= i <= |str| - k
+	{
+		found := isSubstring(str1[i..i+k], str2);
+		i := i + 1;
+	}
 }
 
 method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
