@@ -98,8 +98,11 @@ method haveCommonKSubstring(k: nat, str1: string, str2: string) returns (found: 
 
 	//check each k substring in string 1 to each k substring in string 2
 	var i := 0;
-	while (i < |str1| - k && found == false)
-	invariant 0 <= i <= |str| - k
+	while (i <= |str1| - k && found == false)
+    invariant 0 <= k <= |str1|
+    invariant 0 <= i <= |str1| - k + 1
+	invariant (forall j, y :: 0 <= j < i && y == j + k ==> isNotSubstringPred(str1[j..y], str2)) <==> found == false
+	decreases |str1| - i
 	{
 		found := isSubstring(str1[i..i+k], str2);
 		i := i + 1;
