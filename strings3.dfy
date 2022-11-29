@@ -114,7 +114,18 @@ method maxCommonSubstringLength(str1: string, str2: string) returns (len:nat)
 	ensures (forall k :: len < k <= |str1| ==> !haveCommonKSubstringPred(k,str1,str2))
 	ensures haveCommonKSubstringPred(len,str1,str2)
 {
-//TODO: insert your code here
+	//start with max length size str1
+	len := |str1|;
+	while(len > 0)
+		invariant forall k :: len < k <= |str1| ==> !haveCommonKSubstringPred(k,str1,str2)
+		decreases len
+	{
+		var kSubsRes := haveCommonKSubstring(len, str1, str2);
+		if kSubsRes{ return len;}
+		len := len - 1;
+	}//if not found then exit loop len=0
+	assert isPrefixPred(str1[0..0], str2[0..]);//for len=0 
+	return len;
 }
 
 
